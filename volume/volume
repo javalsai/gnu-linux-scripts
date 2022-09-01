@@ -55,4 +55,6 @@ rnd_rgt_vol="$(echo "$clc_rgt_vol" | awk '{printf("%d\n",$1 + 0.5)}')";
 # Set axmixer values and echo our volume
 echo "Left: $fnl_lft_vol";
 echo "Right: $fnl_rgt_vol";
+echo "Average: $((($fnl_lft_vol+$fnl_rgt_vol)/2))";
+
 amixer set Master "$rnd_lft_vol%,$rnd_rgt_vol%" &> /dev/null
