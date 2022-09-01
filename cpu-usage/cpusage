@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e;
+#awk '{u=$2+$4; t=$2+$4+$5; if (NR==1){u1=u; t1=t;} else printf "%3.1f\n", ($2+$4-u1) * 100 / (t-t1); }'<(grep 'cpu ' /proc/stat) <(sleep 1;grep 'cpu ' /proc/stat)
+ps aux | tail +2 | tr -s ' ' | cut -d ' ' -f 3 | awk 'BEGIN {sum=0} {sum+=$1} END{printf "%3.1f\n", (sum / 12)}'

@@ -1,0 +1,58 @@
+#!/bin/bash
+set -e;
+
+# Wait for other other instances of this file to finish
+while [[ -n `pidof -x "$0" | sed "s/^.*$$//g" | sed "s/ *//g"` ]]; do
+    sleep .1;
+done;
+
+# Function to verify Integers (including negatives)
+isIntRe='^-?[0-9]+$'
+isInt () {
+    if ! [[ $1 =~ $isIntRe ]] ; then
+        echo "err: not a number: '$1'" >&2;
+        exit 1;
+    fi
+}
+
+# Verify args
+# - 1 arg: same increment for left and right
+# - 2 arg: first arg increment to left and second arg to right
+isInt "$1";
+lft_vol_incr="$1";
+rgt_vol_incr="$1";
+if [ -n "$2" ]; then
+    isInt "$2";
+    rgt_vol_incr="$2";
+fi
+
+# Read saved volumes
+lft_vol="$(cat ~/.config/user/volume/lft)";
+rgt_vol="$(cat ~/.config/user/volume/rgt)";
+
+# Calculate final volumes
+fnl_lft_vol="$(echo "$lft_vol+$lft_vol_incr" | bc -l)";
+fnl_rgt_vol="$(echo "$rgt_vol+$rgt_vol_incr" | bc -l)";
+# If volumes are less than 0 set to 0
+if [ "$fnl_lft_vol" -lt 0 ]; then fnl_lft_vol=0; fi
+if [ "$fnl_rgt_vol" -lt 0 ]; then fnl_rgt_vol=0; fi
+# or greater that 100 set to 100
+if [ "$fnl_lft_vol" -gt 100 ]; then fnl_lft_vol=100; fi
+if [ "$fnl_rgt_vol" -gt 100 ]; then fnl_rgt_vol=100; fi
+
+# Save final volumes for next execution
+echo "$fnl_lft_vol" > ~/.config/user/volume/lft;
+echo "$fnl_rgt_vol" > ~/.config/user/volume/rgt;
+
+# Calculate amixer's volume percentage | formula is basically: -log10(-(0.9/(100/$fnl_<x>_vol))+1)*100
+clc_lft_vol="$(echo "-(l(-(.9/(100/$fnl_lft_vol))+1)/l(10))*100" | bc -l)";
+clc_rgt_vol="$(echo "-(l(-(.9/(100/$fnl_rgt_vol))+1)/l(10))*100" | bc -l)";
+
+# Round amixer's volume percentage
+rnd_lft_vol="$(echo "$clc_lft_vol" | awk '{printf("%d\n",$1 + 0.5)}')";
+rnd_rgt_vol="$(echo "$clc_rgt_vol" | awk '{printf("%d\n",$1 + 0.5)}')";
+
+# Set axmixer values and echo our volume
+echo "Left: $fnl_lft_vol";
+echo "Right: $fnl_rgt_vol";
+amixer set Master "$rnd_lft_vol%,$rnd_rgt_vol%" &> /dev/null
