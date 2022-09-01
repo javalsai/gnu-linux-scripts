@@ -3,16 +3,16 @@ This basically changes amixer volume with a different formula that makes the sen
 
 It just has it's own internal volume and then applies the following formula to transform it into amixer values.
 
-$$ y = -log10(-{0.9 \over 100 / x}+1)*100 $$
+$$ y = -log10(-(x/100)*0.9+1)*100 $$
 
 
 <div style="text-align: center;">
 
-[![example-graph](../.other/images/volume-formula.png)](https://www.google.com/search?q=y%3D-log10%28-%280.9%2F%28100%2Fx%29%29%2B1%29*100)
+[![example-graph](../.other/images/volume-formula.png)](https://www.google.com/search?q=y%3D−log10(−(x%2F100)*0.9%2B1)*100)
 
 <sup style="margin-left:auto; text-align:center">
 
-Plain text: `y` = -log10(-(0.9/(100/`x`))+1)*100
+Plain text: `y` = -log10(-(`x`/100)\*0.9+1)\*100
 
 </sup>
 </div>

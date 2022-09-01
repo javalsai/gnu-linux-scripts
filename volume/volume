@@ -45,8 +45,8 @@ echo "$fnl_lft_vol" > ~/.config/user/volume/lft;
 echo "$fnl_rgt_vol" > ~/.config/user/volume/rgt;
 
 # Calculate amixer's volume percentage | formula is basically: -log10(-(0.9/(100/$fnl_<x>_vol))+1)*100
-clc_lft_vol="$(echo "-(l(-(.9/(100/$fnl_lft_vol))+1)/l(10))*100" | bc -l)";
-clc_rgt_vol="$(echo "-(l(-(.9/(100/$fnl_rgt_vol))+1)/l(10))*100" | bc -l)";
+clc_lft_vol="$(echo "-(l(-(($fnl_lft_vol/100)*.9)+1)/l(10))*100" | bc -l)";
+clc_rgt_vol="$(echo "-(l(-(($fnl_rgt_vol/100)*.9)+1)/l(10))*100" | bc -l)";
 
 # Round amixer's volume percentage
 rnd_lft_vol="$(echo "$clc_lft_vol" | awk '{printf("%d\n",$1 + 0.5)}')";
